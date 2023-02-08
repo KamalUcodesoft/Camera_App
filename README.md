@@ -18,7 +18,7 @@ allprojects {
 ```gradle
 
 dependencies {
-  implementation 'com.github.KamalUcodesoft:Camera_App:1.0.0'
+  implementation 'com.github.KamalUcodesoft:Camera_App:1.0.1'
 }
 
 ```
