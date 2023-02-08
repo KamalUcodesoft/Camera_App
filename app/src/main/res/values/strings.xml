@@ -9,4 +9,10 @@
     <string name="clicked_images">Clicked Images</string>
     <string name="cross">cross</string>
     <string name="select">Select</string>
+    <string name="camera_fragment">Camera Fragment</string>
+    <string name="required_permission_msg">permission is required please go to the settings and allow permissions</string>
+    <string name="permission_required">Permission required</string>
+    <string name="go_to_settings">Go to settings</string>
+    <string name="no">No</string>
+    <string name="pack">package</string>
 </resources>

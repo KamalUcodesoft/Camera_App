@@ -19,22 +19,26 @@ class CameraUtil {
 
     private var imageCapture: ImageCapture? = null
 
+    //starting camera function
     fun startCamera(
-        activity: AppCompatActivity,
-        cameraView: PreviewView,
-        cameraFlip: Boolean,
+        activity: AppCompatActivity,    //activity
+        cameraView: PreviewView,    //PreviewView For show camera capturing
+        cameraFlip: Boolean     //boolean value true for back camera, false for front camera
     ) {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(activity)
         cameraProviderFuture.addListener({
+            //initializing camera provider and image capture
             cameraProvider = cameraProviderFuture.get()
             val preview = Preview.Builder().build().also { mPreview ->
                 mPreview.setSurfaceProvider(cameraView.surfaceProvider)
             }
             imageCapture = ImageCapture.Builder().build()
 
+            //camera selector
             val cameraSelector =
                 if (cameraFlip) CameraSelector.DEFAULT_BACK_CAMERA else CameraSelector.DEFAULT_FRONT_CAMERA
 
+            //binding camera provider to the lifecycle
             try {
                 cameraProvider.unbindAll()
                 cameraProvider.bindToLifecycle(activity, cameraSelector, preview, imageCapture)
@@ -45,12 +49,13 @@ class CameraUtil {
     }
 
     fun takePhoto(
-        activity: AppCompatActivity,
-        fileUtil: FileUtil,
-        outputDirectory: File,
-        FILE_NAME_FORMAT: String,
+        activity: AppCompatActivity,    //activity
+        fileUtil: FileUtil,     //FileUtil to save file
+        outputDirectory: File,      //Directory where user want to save images
+        FILE_NAME_FORMAT: String    //image file name format
     ): ArrayList<String> {
 
+        //media directory where captured image is saved for once
         val mediaDir = activity.externalMediaDirs.firstOrNull()?.let { mFile ->
             File(mFile, "Data").apply {
                 mkdirs()
@@ -67,13 +72,18 @@ class CameraUtil {
 
         val outputOption = ImageCapture.OutputFileOptions.Builder(photoFile).build()
 
+        //saving capture image in user defined directory
         imageCapture?.takePicture(outputOption,
             ContextCompat.getMainExecutor(activity),
             object : ImageCapture.OnImageSavedCallback {
                 override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
+
+                    //fetching image from uri
                     val savedUri = Uri.fromFile(photoFile)
                     val ims: InputStream = activity.contentResolver.openInputStream(savedUri)!!
                     val bm = BitmapFactory.decodeStream(ims)
+
+                    //saving file in user directory
                     fileUtil.saveImageToFolder(bm!!, outputDirectory, FILE_NAME_FORMAT)
                 }
 
@@ -82,6 +92,7 @@ class CameraUtil {
                 }
             })
 
+        //returning all images from the directory
         return fileUtil.getImagesFromFile(outputDirectory)
     }
 }

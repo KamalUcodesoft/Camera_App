@@ -47,10 +47,12 @@ class CameraFragment : Fragment() {
         // Inflate the layout for this fragment
         binding = FragmentCameraBinding.inflate(inflater, container, false)
 
+        //calling required functions
         initialise()
         observers()
         bottomSheetDialogInit()
 
+        //gallery images recyclerview
         binding.galleryImagesRecV.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
 
@@ -60,12 +62,16 @@ class CameraFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        //starting camera
         cameraUtil.startCamera(requireActivity() as AppCompatActivity, binding.cameraPreview, flip)
 
+        //show clicked images button click
         binding.galleryBtn.setOnClickListener {
+            //showing bottom sheet dialog
             bottomSheetDialog.show()
         }
 
+        //flip camera button click
         binding.flipBtn.setOnClickListener {
             flip = !flip
             cameraUtil.startCamera(
@@ -73,16 +79,21 @@ class CameraFragment : Fragment() {
             )
         }
 
+        // take photo button click
         binding.takePhotoBtn.setOnClickListener {
 
+            //applying take photo animation
             val takePhotoAnim =
                 AnimationUtils.loadAnimation(requireContext(), R.anim.photo_click_anim)
             takePhotoAnim.duration = 500
             binding.takePhotoBtn.startAnimation(takePhotoAnim)
+
+            //capturing photo
             cameraUtil.takePhoto(
                 requireActivity() as AppCompatActivity, fileUtil, outputDir, FILE_NAME_FORMAT
             )
 
+            //getting all images from the file
             getImagesList()
 
         }
@@ -90,14 +101,16 @@ class CameraFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        //shutting down camera executor
         cameraExecutor.shutdown()
     }
 
+    //initializing all the variables required
     private fun initialise() {
-        cameraExecutor = Executors.newSingleThreadExecutor()
-        val cameraLib = CameraLib()
-        cameraUtil = cameraLib.getCameraUtil()
-        fileUtil = cameraLib.getFileUtil()
+        cameraExecutor = Executors.newSingleThreadExecutor()    //initializing camera executor
+        val cameraLib = CameraLib()                 //Camera library
+        cameraUtil = cameraLib.getCameraUtil()      //CameraUtil from library
+        fileUtil = cameraLib.getFileUtil()          //FileUtil from library
 
         val path = Environment.getExternalStorageDirectory().toString() + "/DCIM/CameraApp"
         outputDir = fileUtil.getDir(path)
@@ -106,6 +119,8 @@ class CameraFragment : Fragment() {
     }
 
     private fun getImagesList() {
+
+        //getting images from gallery and file after some delay
         MainScope().launch {
             delay(1000)
             galleryImagesList.postValue(fileUtil.fetchImagesFromGallery(requireContext()))
@@ -113,17 +128,23 @@ class CameraFragment : Fragment() {
         }
     }
 
+    //observers from ui update
     private fun observers() {
+
+        //observing gallery images changes
         galleryImagesList.observe(viewLifecycleOwner) {
             binding.galleryImagesRecV.adapter =
                 GalleryAdapter(it, requireContext(), fileUtil, outputDir)
         }
+
+        //observing clicked images changes
         clickedImagesList.observe(viewLifecycleOwner) {
             selectedImagesBottomSheetBinding.dialogClickedImagesRecV.adapter =
                 ClickedAdapter(it, requireContext())
         }
     }
 
+    //bottom sheet dialog
     private fun bottomSheetDialogInit() {
         selectedImagesBottomSheetBinding = SelectedBottomSheetBinding.inflate(layoutInflater)
         bottomSheetDialog = Dialog(requireContext())

@@ -10,6 +10,7 @@ import java.util.*
 
 class FileUtil {
 
+    //function for creating directory
     fun getDir(path: String): File {
         val direct = File(path)
         if (!direct.exists()) {
@@ -18,6 +19,7 @@ class FileUtil {
         return direct
     }
 
+    //getting all images form directory
     fun getImagesFromFile(dir: File): ArrayList<String> {
         val list = ArrayList<String>()
         for (file in dir.listFiles()!!) {
@@ -26,8 +28,10 @@ class FileUtil {
         return list
     }
 
+    //saving image in directory
     fun saveImageToFolder(bm: Bitmap, dir: File, name: String) {
 
+        //creating image file
         val image = File(
             dir,
             SimpleDateFormat(name, Locale.getDefault()).format(System.currentTimeMillis()) + ".jpg"
@@ -37,6 +41,7 @@ class FileUtil {
             image.delete()
         }
 
+        //saving image file
         try {
             val out = FileOutputStream(image)
             bm.compress(Bitmap.CompressFormat.JPEG, 100, out)
@@ -47,6 +52,7 @@ class FileUtil {
         }
     }
 
+    //fetching all images from gallery
     fun fetchImagesFromGallery(context: Context): ArrayList<String> {
         val list = ArrayList<String>()
 

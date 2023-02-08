@@ -34,6 +34,7 @@ class GalleryAdapter(
         init {
             imageView = view.findViewById(R.id.galleryIv)
 
+            //showing dialog for selecting image from gallery
             view.setOnClickListener {
                 val dialog = Dialog(context)
                 dialog.setContentView(R.layout.dialog_img)
@@ -48,6 +49,7 @@ class GalleryAdapter(
 
                 Glide.with(context).load(list[adapterPosition]).into(img)
 
+                //save button click for selecting image and save it in user directory
                 saveBtn.setOnClickListener {
                     saveBtn.visibility = View.GONE
                     val bm = BitmapFactory.decodeFile(list[adapterPosition])
@@ -63,6 +65,7 @@ class GalleryAdapter(
                     Toast.makeText(context, "image selected", Toast.LENGTH_SHORT).show()
                 }
 
+                //cross button click for closing dialog
                 crossBtn.setOnClickListener {
                     dialog.dismiss()
                 }
